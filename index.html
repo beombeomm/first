@@ -18,9 +18,53 @@
       background-clip: text;
       color: transparent;
     }
+    #trail {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+    }
   </style>
 </head>
 <body>
   <h1>안녕하세요</h1>
+  <canvas id="trail"></canvas>
+  <script>
+    const canvas = document.getElementById('trail');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const points = [];
+    let hue = 0;
+
+    window.addEventListener('mousemove', (e) => {
+      points.push({ x: e.clientX, y: e.clientY, alpha: 1, hue });
+      hue = (hue + 8) % 360;
+    });
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = points.length - 1; i >= 0; i--) {
+        const p = points[i];
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 8, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${p.hue}, 100%, 60%, ${p.alpha})`;
+        ctx.fill();
+
+        p.alpha -= 0.04;
+        if (p.alpha <= 0) points.splice(i, 1);
+      }
+
+      requestAnimationFrame(animate);
+    }
+    animate();
+  </script>
 </body>
 </html>
