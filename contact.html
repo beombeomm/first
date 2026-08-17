@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>제휴문의</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: system-ui, -apple-system, "Malgun Gothic", sans-serif;
+      background: #f7f7f8;
+    }
+    form {
+      width: 100%;
+      max-width: 420px;
+      padding: 32px;
+      box-sizing: border-box;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+    h1 {
+      margin: 0 0 24px;
+      font-size: 1.5rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 16px;
+      font-size: 0.9rem;
+      color: #333;
+    }
+    input, textarea {
+      width: 100%;
+      margin-top: 6px;
+      padding: 10px;
+      box-sizing: border-box;
+      font: inherit;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      font: inherit;
+      color: #fff;
+      background: #4a5cf5;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #3b4ade;
+    }
+    button:disabled {
+      background: #aaa;
+      cursor: default;
+    }
+    #status {
+      margin-top: 16px;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <form id="contact-form">
+    <h1>제휴문의</h1>
+    <label>
+      회사명 *
+      <input type="text" name="company" required>
+    </label>
+    <label>
+      담당자명 *
+      <input type="text" name="name" required>
+    </label>
+    <label>
+      이메일 *
+      <input type="email" name="email" required>
+    </label>
+    <label>
+      연락처
+      <input type="tel" name="phone">
+    </label>
+    <label>
+      문의내용 *
+      <textarea name="message" required></textarea>
+    </label>
+    <button type="submit">문의 보내기</button>
+    <p id="status"></p>
+  </form>
+
+  <script>
+    const ENDPOINT = 'https://formspree.io/f/mvkpwdgv';
+
+    const form = document.getElementById('contact-form');
+    const button = form.querySelector('button');
+    const status = document.getElementById('status');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      button.disabled = true;
+      status.textContent = '전송 중...';
+
+      try {
+        const res = await fetch(ENDPOINT, {
+          method: 'POST',
+          headers: { Accept: 'application/json' },
+          body: new FormData(form),
+        });
+
+        if (res.ok) {
+          form.reset();
+          status.textContent = '문의가 접수되었습니다. 감사합니다!';
+        } else {
+          status.textContent = '전송에 실패했습니다. 잠시 후 다시 시도해 주세요.';
+        }
+      } catch {
+        status.textContent = '전송에 실패했습니다. 네트워크를 확인해 주세요.';
+      }
+
+      button.disabled = false;
+    });
+  </script>
+</body>
+</html>
